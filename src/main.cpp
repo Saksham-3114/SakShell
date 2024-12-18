@@ -19,6 +19,9 @@ int main() {
     else if(input.substr(0,4)=="echo"){
       cout<<input.substr(5)<<endl;
     }
+    else if(input.find("type ")==0){
+      cout<<input.substr(5)<<": is a shell builtin\n";
+    }
     else{
       cout<<input<<": command not found\n";
     }
