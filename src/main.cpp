@@ -15,6 +15,7 @@ string getPath(string filename){
       return absPath;
     }
   }
+  return "";
 }
 
 int main() {
