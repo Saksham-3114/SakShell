@@ -13,6 +13,11 @@ int main() {
     std::string input;
     std::getline(std::cin, input);
 
-    cout<<input<<": command not found\n";
+    if(input == "exit 0"){
+      break;
+    }else{
+      cout<<input<<": command not found\n";
+    }
+
   }
 }
