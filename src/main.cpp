@@ -20,7 +20,7 @@ int main() {
       cout<<input.substr(5)<<endl;
     }
     else if(input.find("type ")==0){
-      cout<<input.substr(5)<<": is a shell builtin\n";
+      cout<<input.substr(5)<<" is a shell builtin\n";
     }
     else{
       cout<<input<<": command not found\n";
