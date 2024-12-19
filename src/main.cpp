@@ -65,10 +65,6 @@ int main() {
       args.push_back(t);
     }
 
-    // for(auto it:args){
-    //   cout<<it<<" ";
-    // }cout<<endl;
-    // cout<<args[2]<<endl;
 
     if(input == "exit 0"){
       return 0;
