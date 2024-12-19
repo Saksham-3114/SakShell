@@ -113,7 +113,7 @@ int main() {
     }
     else if(args[0]=="cat"){
       // string ans;
-      string system(input.c_str());
+      system(input.c_str());
     }
     else{
       if(!execprog(input)){
