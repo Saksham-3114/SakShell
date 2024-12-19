@@ -2,6 +2,8 @@
 #include <bits/stdc++.h>
 #include <experimental/filesystem>
 #include <sstream>
+#include <cstdlib>
+#include <fstream>
 using namespace std;
 
 string getPath(string filename){
@@ -16,6 +18,30 @@ string getPath(string filename){
     }
   }
   return "";
+}
+
+bool execprog(string input){
+  stringstream ss(input);
+  string t;
+  vector<string> args;
+  char del=' ';
+  while(getline(ss,t,del)){
+    args.push_back(t);
+  }
+  string path=getPath(args[0]);
+  if(path.empty()){
+    return false;
+  }
+  ifstream file(path);
+  if(file.good()){
+    string temp="";
+    for(int i=1;i<args.size();i++){
+      temp+=args[i]+" ";
+    }
+    string command="exec "+path+" "+temp;
+    system(command.c_str());
+    return true;
+  }
 }
 
 int main() {
@@ -48,11 +74,13 @@ int main() {
         else{
           cout<<input.substr(5)<<": not found\n";
         }
-        // cout<<input.substr(5)<<": not found\n";
       }
     }
     else{
-      cout<<input<<": command not found\n";
+      if(!execprog(input)){
+        cout<<input<<": command not found\n";
+      }
+      // else cout<<input<<": command not found\n";
     }
 
   }
