@@ -85,7 +85,9 @@ int main() {
       }
     }
     else if(args[0]=="pwd"){
-      cout<<filesystem::current_path()<<endl;
+      string currPath=filesystem::current_path().string();
+      currPath=currPath.substr(0,currPath.length());
+      cout<<currPath<<endl;
     }
     else{
       if(!execprog(input)){
