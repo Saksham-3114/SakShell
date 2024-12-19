@@ -40,8 +40,8 @@ bool execprog(string input){
     }
     string command="exec "+path+" "+temp;
     system(command.c_str());
-    return true;
   }
+  return true;
 }
 
 int main() {
@@ -55,6 +55,14 @@ int main() {
 
     std::string input;
     std::getline(std::cin, input);
+
+    stringstream ss(input);
+    string t;
+    char del=' ';
+    vector<string> args;
+    while(getline(ss,t,del)){
+      args.push_back(t);
+    }
 
     if(input == "exit 0"){
       return 0;
@@ -75,6 +83,9 @@ int main() {
           cout<<input.substr(5)<<": not found\n";
         }
       }
+    }
+    else if(args[0]=="pwd"){
+      cout<<filesystem::current_path()<<endl;
     }
     else{
       if(!execprog(input)){
