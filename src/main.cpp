@@ -119,7 +119,6 @@ int main() {
       if(!execprog(input)){
         cout<<input<<": command not found\n";
       }
-      // else cout<<input<<": command not found\n";
     }
 
   }
