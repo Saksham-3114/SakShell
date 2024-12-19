@@ -68,8 +68,16 @@ int main() {
     if(input == "exit 0"){
       return 0;
     }
-    else if(input.substr(0,4)=="echo"){
-      cout<<input.substr(5)<<endl;
+    else if(args[0]=="echo"){
+      if(input[5]=='\''){
+        cout<<input.substr(6,input.length()-7)<<endl;
+      }
+      else if(input[5]=='\"'){
+        cout<<input.substr(6,input.length()-7)<<endl;
+      }
+      else{
+        cout<<input.substr(5)<<endl;
+      }
     }
     else if(input.find("type ")==0){
       if(input.find("echo")!=string::npos or input.find("exit")!=string::npos or input.substr(5).find("type")!=string::npos or input.substr(5).find("pwd")!=string::npos){
@@ -98,6 +106,18 @@ int main() {
         filesystem::current_path(args[1]);
       }else{
         cout<<"cd: "<<args[1]<<": No such file or directory\n";
+      }
+    }
+    else if(args[0]=="cat"){
+      // string ans;
+      for(int i=1;i<args.size();i++){
+        ifstream file(args[i]);
+        if(file.good()){
+          string command="cat "+args[i];
+          system(command.c_str());
+        }else{
+          cout<<"cat: "<<args[i]<<": No such file or directory\n";
+        }
       }
     }
     else{
