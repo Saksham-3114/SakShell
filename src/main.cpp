@@ -89,6 +89,13 @@ int main() {
       currPath=currPath.substr(0,currPath.length());
       cout<<currPath<<endl;
     }
+    else if(args[0]=="cd"){
+      if(filesystem::exists(args[1])){
+        filesystem::current_path(args[1]);
+      }else{
+        cout<<"cd: "<<args[1]<<": No such file or directory\n";
+      }
+    }
     else{
       if(!execprog(input)){
         cout<<input<<": command not found\n";
