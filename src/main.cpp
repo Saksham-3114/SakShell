@@ -91,6 +91,9 @@ int main() {
     }
     else if(args[0]=="cd"){
       if(filesystem::exists(args[1])){
+        if(args[1]=="~"){
+          args[1]=getenv("HOME");
+        }
         filesystem::current_path(args[1]);
       }else{
         cout<<"cd: "<<args[1]<<": No such file or directory\n";
