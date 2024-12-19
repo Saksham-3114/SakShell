@@ -71,7 +71,7 @@ int main() {
       cout<<input.substr(5)<<endl;
     }
     else if(input.find("type ")==0){
-      if(input.find("echo")!=string::npos or input.find("exit")!=string::npos or input.substr(5).find("type")!=string::npos){
+      if(input.find("echo")!=string::npos or input.find("exit")!=string::npos or input.substr(5).find("type")!=string::npos or input.substr(5).find("pwd")!=string::npos){
         cout<<input.substr(5)<<" is a shell builtin\n";
       }
       else{
