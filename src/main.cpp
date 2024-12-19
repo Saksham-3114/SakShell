@@ -77,8 +77,8 @@ int main() {
       }
       else{
         for(int i=1;i<args.size();i++){
-          cout<<args[i]<<" ";
-        }
+          if(args[i]!=" ") cout<<args[i]<<" ";
+        }cout<<endl;
       }
     }
     else if(input.find("type ")==0){
