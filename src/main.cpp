@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <fstream>
+#include <unistd.h>
 using namespace std;
 
 string getPath(string filename){
@@ -90,10 +91,10 @@ int main() {
       cout<<currPath<<endl;
     }
     else if(args[0]=="cd"){
-      if(filesystem::exists(args[1])){
-        if(args[1]=="~"){
-          args[1]=getenv("HOME");
-        }
+      if(args[1]=="~"){
+        chdir(getenv("HOME"));
+      }
+      else if(filesystem::exists(args[1])){
         filesystem::current_path(args[1]);
       }else{
         cout<<"cd: "<<args[1]<<": No such file or directory\n";
