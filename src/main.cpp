@@ -117,15 +117,7 @@ int main() {
     }
     else if(args[0]=="cat"){
       // string ans;
-      for(int i=1;i<args.size();i++){
-        ifstream file(args[i]);
-        if(file.good()){
-          string command="cat "+args[i];
-          system(command.c_str());
-        }else{
-          cout<<"cat: "<<args[i]<<": No such file or directory\n";
-        }
-      }
+      string system(input.c_str());
     }
     else{
       if(!execprog(input)){
