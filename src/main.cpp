@@ -76,7 +76,9 @@ int main() {
         cout<<input.substr(6,input.length()-7)<<endl;
       }
       else{
-        cout<<input.substr(5)<<endl;
+        for(int i=1;i<args.size();i++){
+          cout<<args[i]<<" ";
+        }
       }
     }
     else if(input.find("type ")==0){
