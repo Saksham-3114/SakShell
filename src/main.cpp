@@ -108,11 +108,12 @@ bool execQprog(string input) {
         i++;
       }
       // cout<<out<<endl;
-      args[0]=out;
+      args.push_back(out);
+      // cout<<args[0]<<endl;
     }
     else if (input[5] == '\"') {
       string out = parseDQ(input);
-      args[0] = out;
+      args.push_back(out);
     }
 
     // Add the last argument if there's any left
