@@ -115,6 +115,7 @@ int main() {
               res.push_back(c);
             }
           }
+          cout<<res<<endl;
         }
         else{
           for(int i=1;i<args.size();i++){
