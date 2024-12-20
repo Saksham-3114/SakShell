@@ -100,24 +100,18 @@ bool execQprog(string input) {
     string currentArg;
 
     // Parse the input for quoted executable and its arguments
-    for (size_t i = 0; i < input.size(); ++i) {
-        char c = input[i];
-        if (c == '"' && !inQuotes) {
-            inQuotes = true;
-        } else if (c == '"' && inQuotes) {
-            inQuotes = false;
-            // Add the argument when closing the quote
-            args.push_back(currentArg);
-            currentArg.clear();
-        } else if (inQuotes) {
-            currentArg += c;  // Inside quotes, accumulate characters
-        } else if (c == ' ' && !inQuotes && !currentArg.empty()) {
-            // When space is outside quotes and an argument is accumulated
-            args.push_back(currentArg);
-            currentArg.clear();
-        } else if (c != ' ') {
-            currentArg += c;  // Add normal characters to current argument
-        }
+    if (input[0] == '\'') {
+      string out="";
+      int i=1;
+      while(input[i]!='\''){
+        out+=input[i];
+        i++;
+      }
+      args[0]=out;
+    }
+    else if (input[5] == '\"') {
+      string out = parseDQ(input);
+      args[0] = out;
     }
 
     // Add the last argument if there's any left
