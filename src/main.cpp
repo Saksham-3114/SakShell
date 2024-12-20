@@ -107,7 +107,7 @@ bool execQprog(string input) {
         out+=input[i];
         i++;
       }
-      cout<<out<<endl;
+      // cout<<out<<endl;
       args[0]=out;
     }
     else if (input[5] == '\"') {
@@ -116,9 +116,9 @@ bool execQprog(string input) {
     }
 
     // Add the last argument if there's any left
-    if (!currentArg.empty()) {
-        args.push_back(currentArg);
-    }
+    // if (!currentArg.empty()) {
+    //     args.push_back(currentArg);
+    // }
 
     // Step 2: Resolve the executable path
     if (args.empty()) {
