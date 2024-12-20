@@ -45,6 +45,26 @@ bool execprog(string input){
   return true;
 }
 
+vector<string> extractQuotedText(const string& input) {
+    vector<string> quotedTexts;
+    bool inQuotes = false;
+    string currentText;
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        if (input[i] == '"') {
+            if (inQuotes) {
+                quotedTexts.push_back(currentText);
+                currentText.clear();
+            }
+            inQuotes = !inQuotes;
+        } else if (inQuotes) {
+            currentText += input[i];
+        }
+    }
+
+    return quotedTexts;
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
@@ -74,16 +94,9 @@ int main() {
         cout<<input.substr(6,input.length()-7)<<endl;
       }
       else if(input[5]=='\"'){
-        stringstream ss1(input.substr(6,input.length()-7));
-        string temp;
-        char del1='\"';
-        vector<string> dQuotesArgs;
-        while(getline(ss1,temp,del1)){
-          dQuotesArgs.push_back(temp);
-        }
-        // cout<<dQuotesArgs.size()<<endl;
-        for(auto it:dQuotesArgs){
-          if(it!=" ") cout<<it<<" ";
+        vector<string> qText=extractQuotedText(input);
+        for(int i=0;i<qText.size();i++){
+          cout<<qText[i]<<" ";
         }cout<<endl;
       }
       else{
