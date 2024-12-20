@@ -83,7 +83,7 @@ int main() {
         }
         // cout<<dQuotesArgs.size()<<endl;
         for(auto it:dQuotesArgs){
-          if(!it.empty()) cout<<it<<" ";
+          if(it!=" ") cout<<it<<" ";
         }cout<<endl;
       }
       else{
