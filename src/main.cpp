@@ -74,7 +74,17 @@ int main() {
         cout<<input.substr(6,input.length()-7)<<endl;
       }
       else if(input[5]=='\"'){
-        cout<<input.substr(6,input.length()-7)<<endl;
+        stringstream ss1(input.substr(6,input.length()-7));
+        string temp;
+        char del1='\"';
+        vector<string> dQuotesArgs;
+        while(getline(ss1,temp,del1)){
+          dQuotesArgs.push_back(temp);
+        }
+        // cout<<dQuotesArgs.size()<<endl;
+        for(auto it:dQuotesArgs){
+          if(!it.empty()) cout<<it<<" ";
+        }cout<<endl;
       }
       else{
         for(int i=1;i<args.size();i++){
