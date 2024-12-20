@@ -255,7 +255,7 @@ int main() {
             system(input.c_str());
         }
         else {
-            if (!execprog(input) or !execQprog(input)) {
+            if (!execprog(input) and !execQprog(input)) {
                 cout << input << ": command not found\n";
             }
         }
