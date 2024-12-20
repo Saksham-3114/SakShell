@@ -130,7 +130,7 @@ bool execQprog(string input) {
         cout << "No executable specified." << endl;
         return false;
     }
-
+    cout<<args[0]<<endl;
     string path = getPath(args[0]);
     if (path.empty()) {
         cout << "Executable not found in PATH." << endl;
