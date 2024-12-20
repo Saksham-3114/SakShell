@@ -71,8 +71,14 @@ string parseDQ(string input){
   bool inQuotes=false;
   for(auto c:input){
     if(escape){
-      if(inQuotes and (c=='\\' or c=='"' or c=='\n' or c=='$')){
-        res.push_back(c);
+      if(inQuotes){
+        if((c=='\\' or c=='"' or c=='\n' or c=='$')){
+          res.push_back(c);
+        }
+        else{
+          res.push_back('\\');
+          res.push_back(c);
+        }
       }
       else{
         res.push_back(c);
