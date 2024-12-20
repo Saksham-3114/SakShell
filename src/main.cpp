@@ -65,6 +65,32 @@ vector<string> extractQuotedText(const string& input) {
     return quotedTexts;
 }
 
+string parseDQ(string input){
+  string res="";
+  bool escape=false;
+  bool inQuotes=false;
+  for(auto c:input){
+    if(escape){
+      if(inQuotes and (c=='\\' or c=='"' or c=='\n' or c=='$')){
+        res.push_back(c);
+      }
+      else{
+        res.push_back(c);
+      }
+      escape=false;
+    }
+    else if(c=='\\'){
+      escape=true;
+    }
+    else if(c=='"'){
+      inQuotes=!inQuotes;
+    }else{
+      res.push_back(c);
+    }
+  }
+  return res;
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
@@ -94,10 +120,16 @@ int main() {
         cout<<input.substr(6,input.length()-7)<<endl;
       }
       else if(input[5]=='\"'){
-        vector<string> qText=extractQuotedText(input);
-        for(int i=0;i<qText.size();i++){
-          cout<<qText[i]<<" ";
-        }cout<<endl;
+        if(input.find('\\')!=string::npos){
+          string output=parseDQ(input.substr(5));
+          cout<<output<<endl;
+        }
+        else{
+          vector<string> qText=extractQuotedText(input);
+          for(int i=0;i<qText.size();i++){
+            cout<<qText[i]<<" ";
+          }cout<<endl;
+        }
       }
       else{
         if(input.find('\\')!=string::npos){
