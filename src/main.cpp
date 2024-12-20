@@ -128,27 +128,20 @@ bool execQprog(string input) {
     }
     // cout<<args[0]<<endl;
     string path = getPath(args[0]);
-    cout<<path<<endl;
+    // cout<<path<<endl;
     if (path.empty()) {
         cout << "Executable not found in PATH." << endl;
         return false;
     }
-
-    // Step 3: Prepare arguments for execvp
-    vector<const char*> execArgs;
-    execArgs.push_back(path.c_str());
-
-    for (size_t i = 1; i < args.size(); ++i) {
-        execArgs.push_back(args[i].c_str());
+    string filename;
+    int i;
+    for (i = 0; i < args.size(); i++) {
     }
-    execArgs.push_back(nullptr);
-
-    // Step 4: Execute the command using execvp
-    if (execvp(execArgs[0], const_cast<char**>(&execArgs[0])) == -1) {
-        perror("Execution failed");
-        return false;
+    for(int j=1;j<i;j++){
+      filename.push_back(input[j]);
     }
-
+    string command = "exec " + path+" "+filename;
+    system(command.c_str());
     return true;
 }
 
