@@ -107,6 +107,7 @@ bool execQprog(string input) {
         out+=input[i];
         i++;
       }
+      cout<<out<<endl;
       args[0]=out;
     }
     else if (input[5] == '\"') {
