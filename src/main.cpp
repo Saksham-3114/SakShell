@@ -100,9 +100,27 @@ int main() {
         }cout<<endl;
       }
       else{
-        for(int i=1;i<args.size();i++){
-          if(!args[i].empty()) cout<<args[i]<<" ";
-        }cout<<endl;
+        if(input.find('\\')!=string::npos){
+          string res="";
+          bool escape=false;
+          for(auto c:input.substr(5)){
+            if(escape){
+              res.push_back(c);
+              escape=false;
+            }
+            else if(c=='\\'){
+              escape=true;
+            }
+            else{
+              res.push_back(c);
+            }
+          }
+        }
+        else{
+          for(int i=1;i<args.size();i++){
+            if(!args[i].empty()) cout<<args[i]<<" ";
+          }cout<<endl;
+        }
       }
     }
     else if(input.find("type ")==0){
