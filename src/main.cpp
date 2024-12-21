@@ -98,41 +98,35 @@ bool execQprog(string input) {
     string currentArg;
     bool inSingleQuotes = false, inDoubleQuotes = false, escape = false;
 
-    // Enhanced parsing logic
     for (size_t i = 0; i < input.size(); ++i) {
         char c = input[i];
 
         if (escape) {
-            // Handle escaped characters
+            // Handle escaped characters (only in unquoted or double-quoted context)
             currentArg += c;
             escape = false;
         } else if (c == '\\') {
-            escape = true;
+            // Start escape sequence
+            if (inSingleQuotes) {
+                // Backslashes are literal in single quotes
+                currentArg += c;
+            } else {
+                escape = true;
+            }
         } else if (c == '\'' && !inDoubleQuotes) {
-            // Toggle single quotes mode
+            // Toggle single quotes
             inSingleQuotes = !inSingleQuotes;
-            if (!inSingleQuotes && !currentArg.empty()) {
-                args.push_back(currentArg);
-                currentArg.clear();
-            }
         } else if (c == '"' && !inSingleQuotes) {
-            // Toggle double quotes mode
+            // Toggle double quotes
             inDoubleQuotes = !inDoubleQuotes;
-            if (!inDoubleQuotes && !currentArg.empty()) {
-                args.push_back(currentArg);
-                currentArg.clear();
-            }
         } else if (c == ' ' && !inSingleQuotes && !inDoubleQuotes) {
-            // Handle unquoted space as argument separator
+            // Unquoted space ends the current argument
             if (!currentArg.empty()) {
                 args.push_back(currentArg);
                 currentArg.clear();
             }
-        } else if (c == '\n' && (inSingleQuotes || inDoubleQuotes)) {
-            // Preserve newlines within quotes
-            currentArg += c;
         } else {
-            // Add character to the current argument
+            // Add the character to the current argument
             currentArg += c;
         }
     }
@@ -142,7 +136,7 @@ bool execQprog(string input) {
         args.push_back(currentArg);
     }
 
-    // Ensure we have an executable
+    // Ensure there is at least one argument (the executable)
     if (args.empty()) {
         cout << "No executable specified." << endl;
         return false;
@@ -155,9 +149,10 @@ bool execQprog(string input) {
         return false;
     }
 
-    // Build the command
+    // Build the command string
     string command = "\"" + path + "\"";
     for (size_t i = 1; i < args.size(); ++i) {
+        // Quote each argument for safety
         command += " \"" + args[i] + "\"";
     }
 
@@ -169,6 +164,7 @@ bool execQprog(string input) {
     }
     return true;
 }
+
 
 
 
