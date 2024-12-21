@@ -140,7 +140,7 @@ bool execQprog(string input) {
     for(int j=i;j<input.size();j++){
       filename.push_back(input[j]);
     }
-    // cout<<filename<<endl;
+    cout<<filename<<endl;
     string command = "exec " + path+" "+filename;
     system(command.c_str());
     return true;
