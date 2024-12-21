@@ -128,7 +128,7 @@ bool execQprog(string input) {
     }
     // cout<<args[0]<<endl;
     string path = getPath(args[0]);
-    cout<<path<<endl;
+    // cout<<path<<endl;
     if (path.empty()) {
         cout << "Executable not found in PATH." << endl;
         return false;
@@ -137,10 +137,10 @@ bool execQprog(string input) {
     int i;
     for (i = 0; i < args.size(); i++) {
     }
-    for(int j=1;j<i;j++){
+    for(int j=i;j<input.size();j++){
       filename.push_back(input[j]);
     }
-    cout<<filename<<endl;
+    // cout<<filename<<endl;
     string command = "exec " + path+" "+filename;
     system(command.c_str());
     return true;
