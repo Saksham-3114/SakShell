@@ -96,33 +96,48 @@ string parseDQ(string input) {
 bool execQprog(string input) {
     vector<string> args;
     string currentArg;
-    bool inSingleQuotes = false, inDoubleQuotes = false;
+    bool inSingleQuotes = false, inDoubleQuotes = false, escape = false;
 
-    // Parse the input
+    // Enhanced parsing logic
     for (size_t i = 0; i < input.size(); ++i) {
         char c = input[i];
 
-        if (c == '\'' && !inDoubleQuotes) {
+        if (escape) {
+            // Handle escaped characters
+            currentArg += c;
+            escape = false;
+        } else if (c == '\\') {
+            escape = true;
+        } else if (c == '\'' && !inDoubleQuotes) {
+            // Toggle single quotes mode
             inSingleQuotes = !inSingleQuotes;
             if (!inSingleQuotes && !currentArg.empty()) {
                 args.push_back(currentArg);
                 currentArg.clear();
             }
         } else if (c == '"' && !inSingleQuotes) {
+            // Toggle double quotes mode
             inDoubleQuotes = !inDoubleQuotes;
             if (!inDoubleQuotes && !currentArg.empty()) {
                 args.push_back(currentArg);
                 currentArg.clear();
             }
         } else if (c == ' ' && !inSingleQuotes && !inDoubleQuotes) {
+            // Handle unquoted space as argument separator
             if (!currentArg.empty()) {
                 args.push_back(currentArg);
                 currentArg.clear();
             }
+        } else if (c == '\n' && (inSingleQuotes || inDoubleQuotes)) {
+            // Preserve newlines within quotes
+            currentArg += c;
         } else {
+            // Add character to the current argument
             currentArg += c;
         }
     }
+
+    // Add the last argument if any
     if (!currentArg.empty()) {
         args.push_back(currentArg);
     }
@@ -154,6 +169,7 @@ bool execQprog(string input) {
     }
     return true;
 }
+
 
 
 int main() {
