@@ -135,7 +135,7 @@ bool execQprog(string input) {
     }
     string filename;
     int i;
-    for (i = 0; i < args.size(); i++) {
+    for (i = 0; i < args[0].size(); i++) {
     }
     for(int j=i;j<input.size();j++){
       filename.push_back(input[j]);
