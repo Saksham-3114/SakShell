@@ -94,58 +94,67 @@ string parseDQ(string input) {
 }
 
 bool execQprog(string input) {
-    // Step 1: Handle quoted input by splitting it into executable and arguments
     vector<string> args;
-    bool inQuotes = false;
     string currentArg;
+    bool inSingleQuotes = false, inDoubleQuotes = false;
 
-    // Parse the input for quoted executable and its arguments
-    if (input[0] == '\'') {
-      string out="";
-      int i=1;
-      while(input[i]!='\''){
-        out+=input[i];
-        i++;
-      }
-      // cout<<out<<endl;
-      args.push_back(out);
-      // cout<<args[0]<<endl;
+    // Parse the input
+    for (size_t i = 0; i < input.size(); ++i) {
+        char c = input[i];
+
+        if (c == '\'' && !inDoubleQuotes) {
+            inSingleQuotes = !inSingleQuotes;
+            if (!inSingleQuotes && !currentArg.empty()) {
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
+        } else if (c == '"' && !inSingleQuotes) {
+            inDoubleQuotes = !inDoubleQuotes;
+            if (!inDoubleQuotes && !currentArg.empty()) {
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
+        } else if (c == ' ' && !inSingleQuotes && !inDoubleQuotes) {
+            if (!currentArg.empty()) {
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
+        } else {
+            currentArg += c;
+        }
     }
-    else if (input[5] == '\"') {
-      string out = parseDQ(input);
-      args.push_back(out);
+    if (!currentArg.empty()) {
+        args.push_back(currentArg);
     }
 
-    // Add the last argument if there's any left
-    // if (!currentArg.empty()) {
-    //     args.push_back(currentArg);
-    // }
-
-    // Step 2: Resolve the executable path
+    // Ensure we have an executable
     if (args.empty()) {
         cout << "No executable specified." << endl;
         return false;
     }
-    // cout<<args[0]<<endl;
+
+    // Resolve the executable path
     string path = getPath(args[0]);
-    cout<<path<<endl;
     if (path.empty()) {
-        cout << "Executable not found in PATH." << endl;
+        cout << args[0] << ": Executable not found in PATH." << endl;
         return false;
     }
-    string filename;
-    int i;
-    for (i = 0; i < args[0].size(); i++) {
+
+    // Build the command
+    string command = "\"" + path + "\"";
+    for (size_t i = 1; i < args.size(); ++i) {
+        command += " \"" + args[i] + "\"";
     }
-    for(int j=i+3;j<input.size();j++){
-      filename.push_back(input[j]);
+
+    // Execute the command
+    int ret = system(command.c_str());
+    if (ret == -1) {
+        perror("Error executing command");
+        return false;
     }
-    filename=getPath(filename);
-    cout<<filename<<endl;
-    string command = "exec " + path+" "+filename;
-    system(command.c_str());
     return true;
 }
+
 
 int main() {
     // Flush after every std::cout / std:cerr
