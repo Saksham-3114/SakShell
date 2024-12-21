@@ -137,7 +137,7 @@ bool execQprog(string input) {
     int i;
     for (i = 0; i < args[0].size(); i++) {
     }
-    for(int j=i;j<input.size();j++){
+    for(int j=i+3;j<input.size();j++){
       filename.push_back(input[j]);
     }
     cout<<filename<<endl;
