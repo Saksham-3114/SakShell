@@ -116,6 +116,11 @@ bool execQprog(string input) {
         } else if (c == '\'' && !inDoubleQuotes) {
             // Toggle single quotes
             inSingleQuotes = !inSingleQuotes;
+            if (!inSingleQuotes && currentArg.empty()) {
+                // Preserve single-quoted content as is
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
         } else if (c == '"' && !inSingleQuotes) {
             // Toggle double quotes
             inDoubleQuotes = !inDoubleQuotes;
@@ -164,6 +169,7 @@ bool execQprog(string input) {
     }
     return true;
 }
+
 
 
 
