@@ -312,6 +312,7 @@ int main() {
       }
       break;
       case TypeEnum::TYPE: {
+        doType(input, offset, path);
         }
       break;
       case TypeEnum::PWD: {
