@@ -161,7 +161,6 @@ int main() {
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
-    // Uncomment this block to pass the first stage
     while (true) {
         std::cout << "$ ";
 
@@ -176,7 +175,7 @@ int main() {
             args.push_back(t);
         }
 
-        if (input == "exit 0") {
+        if (args[0] == "exit") {
             return 0;
         }
         else if (args[0] == "echo") {
@@ -254,6 +253,7 @@ int main() {
         }
         else if (args[0] == "cat") {
             system(input.c_str());
+            cout<<endl;
         }
         else {
             if (!execprog(input) and !execQprog(input)) {
