@@ -1,342 +1,264 @@
 #include <iostream>
-#include <array>
-#include <cstdlib>
-#include <unordered_set>
-#include <list>
-#include <filesystem>
-#include <fstream>
+#include <bits/stdc++.h>
+#include <experimental/filesystem>
 #include <sstream>
-enum class TypeEnum {
-  NOT_FOUND,
-  EXIT,
-  ECHO,
-  TYPE,
-  PWD,
-  CD,
-};
+#include <cstdlib>
+#include <fstream>
+#include <unistd.h>
+using namespace std;
 
-struct TypeDscr {
-  TypeEnum type;
-  std::string_view typeStr;
-};
-std::array<TypeDscr, 5> types = {{
-  { TypeEnum::EXIT, "exit" },
-  { TypeEnum::ECHO, "echo" },
-  { TypeEnum::TYPE, "type" },
-  { TypeEnum::PWD,  "pwd"  },
-  { TypeEnum::CD,   "cd"   },
-}};
-
-void removeSymbFromStart(std::string& str, char c) {
-  size_t start = 0;
-  while (str[start] == c && start < str.size()) {
-    start++;
-  }
-  str = str.substr(start);
-}
-void skipSymbol(const std::string& input, size_t& offset, char c) {
-  while (input[offset] == c && offset < input.size()) {
-    offset++;
-  }
-}
-void removeSymbFromEnd(std::string& str, char c) {
-  size_t end = str.size()-1;
-  while (str[end] == c && end >= 0) {
-    end--;
-  }
-  if (end > 0) {
-    str = str.substr(0, end+1);
-  } else {
-        str = "";
-  }
-}
-std::string getWord(const std::string& input, size_t& offset) {
-  skipSymbol(input, offset, ' ');
-  size_t start = offset;
-  std::string result = input;
-  while (offset != input.size()) {
-    if (input[offset] == ' ') {
-      result = input.substr(start, offset-start);
-      break;
-    }
-    offset++;
-  }
-  return result;
-} 
-
-TypeEnum getType(const std::string& word) {
-  for (auto& t : types) {
-    if (t.typeStr == word) {
-      return t.type;
-    }
-  }
-  return TypeEnum::NOT_FOUND;
-}
-
-bool checkExit(const std::string& input) {
-  return input == "exit 0";
-}
-void updateBackSlash(std::string& str, int state) {
-  int j = 0;
-  // std::cout << "state = " << state << ", str = " << str << std::endl;
-  if (state == 0) {
-    if (str == "\\") {
-      str = " ";
-      return;
-    } else if (*str.rbegin() == '\\') {
-      str += ' ';
-    }
-    bool flag = false;
-    for (int i = 0; i < str.size(); i++) {
-      if (i > 0 && str[i] != '\\' ) {
-        j++;
-      }
-      if (i > j && str[i] != '\\' ) {
-        str[j] = str[i];
-      }
-    }
-    // std::cout << "j = " << j << std::endl;
-    if (j > 0) {
-      str = str.substr(0, j+1);
-    }
-    } else if (state == 2) {
-    for (int i = 0; i < str.size(); i++) {      
-      bool isSpecSymb = str[i] == '\\' && 
-        (i < str.size() && (str[i+1] == '\\' || str[i+1] == '$' || str[i+1] == '\"') ) ;
-      
-      // std::cout << i << " " << j << " " << isSpecSymb << " " << str << std::endl;
-      if (isSpecSymb) {
-        i++;
-      } 
-      str[j++] = str[i];
-    }
-    str = str.substr(0, j);
-  }
-  
-}
-void tokenize(std::string& result, const std::string& input, size_t offset) {
-  std::string token = "";
-  result = "";
-  auto addStrToResult = [&result] (const std::string& str)
-  {
-    // std::cout << "addStrToResult: result = '" << result <<"'" << std::endl; 
-    result += str;
-  };
-  auto addSpaceToResult = [&result] ()
-  {
-    // std::cout << "addSpaceToResult: result = '" << result <<"'" << std::endl; 
-    if (!result.empty() && *result.rbegin() != ' ') {
-      result += ' ';
-    } 
-  };
-  int state = 0;
-  char prevC = 'x';
-  for (size_t i = offset; i < input.size(); i++) {
-    switch (state) {
-      case 0: {
-        // std::cout << i << ", '" << input[i] << "'" << std::endl;
-        if (input[i] == ' ') {
-          if (!token.empty()) {
-            updateBackSlash(token, state);
-            addStrToResult(token);
-            token.clear();
-          }
-          addSpaceToResult();
-        } else if (input[i] == '\'') {
-          state = 1;
-        } else if (input[i] == '"' && prevC != '\\') {
-          state = 2;
-        } else {
-          token += input[i];
+string getPath(string filename) {
+    string pathEnv = getenv("PATH");
+    stringstream ss(pathEnv);
+    string path;
+    while (!ss.eof()) {
+        getline(ss, path, ':');
+        string absPath = path + "/" + filename;
+        if (filesystem::exists(absPath)) {
+            return absPath;
         }
-      }
-      break;
-       case 1: {
-        if (input[i] == '\'') {
-          updateBackSlash(token, state);
-          addStrToResult(token);
-          token.clear();
-          state = 0;
-        } else {
-          token += input[i];
+    }
+    return "";
+}
+
+bool execprog(string input) {
+    stringstream ss(input);
+    string t;
+    vector<string> args;
+    char del = ' ';
+    while (getline(ss, t, del)) {
+        args.push_back(t);
+    }
+    string path = getPath(args[0]);
+    if (path.empty()) {
+        return false;
+    }
+    ifstream file(path);
+    if (file.good()) {
+        string temp = "";
+        for (int i = 1; i < args.size(); i++) {
+            temp += args[i] + " ";
         }
-      }
-      break;
-       case 2: {
-        if (input[i] == '"' && prevC != '\\') {
-          updateBackSlash(token, state);
-          addStrToResult(token);
-          token.clear();
-          state = 0;
-        } else {
-          token += input[i];
-        }
-      }
-      break;
-    }
-    if (prevC == '\\' && input[i] == '\\') {
-      prevC = 'X';
-    } else {
-      prevC = input[i];
-    }
-  }
-  if (!token.empty()) {
-    updateBackSlash(token, state);
-    addStrToResult(token);
-    token.clear();
-  }
-}
-void doEcho(const std::string& input, size_t offset) {
-  skipSymbol(input, offset, ' ');
-  std::string result;
-  tokenize(result, input, offset);
-  std::cout << result;
-  std::cout << std::endl;
-}
-bool findFilePath(std::string& filePath, const std::string& fileName, const std::unordered_set<std::string>& path) {
-  for (auto& p : path) {
-    if (std::filesystem::exists(p + "/" + fileName)) {
-      filePath = p + "/" + fileName;
-      return true;
-    }
-  }
-  return false;
-}
-void doType(const std::string& input, size_t offset, const std::unordered_set<std::string>& path) {
-  skipSymbol(input, offset, ' ');
-  std::string word = input.substr(offset);
-  if (getType(word) != TypeEnum::NOT_FOUND) {
-    std::cout << word << " is a shell builtin" << std::endl;
-  } else {
-    std::string filePath;
-    if (findFilePath(filePath, word, path)) {
-      std::cout << word << " is " << filePath << std::endl;
-    } else {
-      std::cout << word << ": not found" << std::endl;
-    }
-  }
-}
-void doPwd() {
-  std::cout << std::filesystem::current_path().string() << std::endl;
-}
-void doCd(const std::string& input, size_t offset) {
-  skipSymbol(input, offset, ' ');
-  std::string path;
-  if (input[offset] == '~') {
-    path = std::getenv("HOME") + input.substr(offset+1);
-  } else {
-    path = input.substr(offset);
-  }
-  if (std::filesystem::exists(path)) {
-    std::filesystem::current_path(path);
-  } else {
-    std::cout << "cd: " << path << ": No such file or directory" << std::endl;
-  }
-}
-void doCommandNotFound(const std::string& str) {
-  std::cout << str << ": command not found" << std::endl; 
-}
-void parsePath(std::unordered_set<std::string>& path) {
-  const char* env_p = std::getenv("PATH");
-  // std::cout << "PATH is " << env_p << std::endl;
-  int i = 0;
-  std::string pathComp = "";
-  while (env_p[i] != '\0') {
-    if (env_p[i] == ':') {
-      path.insert(pathComp);
-      pathComp = "";
-    } else {
-      pathComp += env_p[i];
-    }
-    i++;
-  }
-}
-std::string doExecute(const std::string& filePath) {
-  std::string result = "";
-  FILE* pipe = popen(filePath.c_str(), "r");
-  char buf[2];
-  while (fgets(buf, sizeof buf, pipe) != NULL) {
-    // std::cout << "buf = " << buf << std::endl;
-    result += buf;
-  }
-  pclose(pipe);
-  // std::cout << "filePath = " << filePath << ", result = " << result << std::endl;
-  return result;
-}
-bool checkExeWith(const std::string& word, const std::string& input, size_t& offset){
-  if (word == "exe" || word == "'exe" || word == "\"exe") {
-    while (input[offset] != '/') {
-      offset++;
+        string command = "exec " + path + " " + temp;
+        system(command.c_str());
     }
     return true;
-  }
-  return false; 
 }
-bool tryRunCommand(const std::string& word, const std::string& str,
-  const std::unordered_set<std::string>& path) {
-  std::string filePath;
 
-  if (findFilePath(filePath, word, path)) {
-    std::cout << doExecute(filePath + " " + str);
-    return true;
-  }
-  return false;
+vector<string> extractQuotedText(const string& input) {
+    vector<string> quotedTexts;
+    bool inQuotes = false;
+    string currentText;
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        if (input[i] == '"') {
+            if (inQuotes) {
+                quotedTexts.push_back(currentText);
+                currentText.clear();
+            }
+            inQuotes = !inQuotes;
+        } else if (inQuotes) {
+            currentText += input[i];
+        }
+    }
+
+    return quotedTexts;
 }
+
+string parseDQ(string input) {
+    string res = "";
+    bool escape = false;
+    bool inQuotes = false;
+    for (auto c : input) {
+        if (escape) {
+            if (inQuotes) {
+                if ((c == '\\' or c == '"' or c == '\n' or c == '$')) {
+                    res.push_back(c);
+                } else {
+                    res.push_back('\\');
+                    res.push_back(c);
+                }
+            } else {
+                res.push_back(c);
+            }
+            escape = false;
+        } else if (c == '\\') {
+            escape = true;
+        } else if (c == '"') {
+            inQuotes = !inQuotes;
+        } else {
+            res.push_back(c);
+        }
+    }
+    return res;
+}
+
+bool execQprog(string input) {
+    vector<string> args;
+    string currentArg;
+    bool inSingleQuotes = false, inDoubleQuotes = false;
+
+    // Parse the input
+    for (size_t i = 0; i < input.size(); ++i) {
+        char c = input[i];
+
+        if (c == '\'' && !inDoubleQuotes) {
+            inSingleQuotes = !inSingleQuotes;
+            if (!inSingleQuotes && !currentArg.empty()) {
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
+        } else if (c == '"' && !inSingleQuotes) {
+            inDoubleQuotes = !inDoubleQuotes;
+            if (!inDoubleQuotes && !currentArg.empty()) {
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
+        } else if (c == ' ' && !inSingleQuotes && !inDoubleQuotes) {
+            if (!currentArg.empty()) {
+                args.push_back(currentArg);
+                currentArg.clear();
+            }
+        } else {
+            currentArg += c;
+        }
+    }
+    if (!currentArg.empty()) {
+        args.push_back(currentArg);
+    }
+
+    // Ensure we have an executable
+    if (args.empty()) {
+        cout << "No executable specified." << endl;
+        return false;
+    }
+
+    // Resolve the executable path
+    string path = getPath(args[0]);
+    if (path.empty()) {
+        cout << args[0] << ": Executable not found in PATH." << endl;
+        return false;
+    }
+
+    // Build the command
+    string command = "\"" + path + "\"";
+    for (size_t i = 1; i < args.size(); ++i) {
+        command += " \"" + args[i] + "\"";
+    }
+
+    // Execute the command
+    int ret = system(command.c_str());
+    if (ret == -1) {
+        perror("Error executing command");
+        return false;
+    }
+    return true;
+}
+
+
 int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
-  // Uncomment this block to pass the first stage
-  std::cout << "$ ";
-  std::unordered_set<std::string> path;
-  parsePath(path);
-  
-  std::string input;
-  
-  bool error;
-  bool exit = false;
-  size_t offset;
-  std::string command;
-  while (true) {
-    std::getline(std::cin, input);
-    offset = 0;
-    error = false;
-    command = getWord(input, offset);
-    switch (getType(command)) {
-      case TypeEnum::EXIT: {
-        exit = checkExit(input);
-      }
-      break;
-      case TypeEnum::ECHO: {
-        doEcho(input, offset);
-      }
-      break;
-      case TypeEnum::TYPE: {
-        doType(input, offset, path);
+    // Flush after every std::cout / std:cerr
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
+
+    // Uncomment this block to pass the first stage
+    while (true) {
+        std::cout << "$ ";
+
+        std::string input;
+        std::getline(std::cin, input);
+
+        stringstream ss(input);
+        string t;
+        char del = ' ';
+        vector<string> args;
+        while (getline(ss, t, del)) {
+            args.push_back(t);
         }
-      break;
-      case TypeEnum::PWD: {
-        doPwd();
-      }
-      break;
-      case TypeEnum::CD: {
-        doCd(input, offset);
-      }
-      break;
-      case TypeEnum::NOT_FOUND: {
-        if (command != "cat" && checkExeWith(command, input, offset)) {
-          command = "cat";
+
+        if (input == "exit 0") {
+            return 0;
         }
-        error = !tryRunCommand(command, input.substr(offset), path);
-      }
-      break;
+        else if (args[0] == "echo") {
+            if (input[5] == '\'') {
+                cout << input.substr(6, input.length() - 7) << endl;
+            }
+            else if (input[5] == '\"') {
+                if (input.find('\\') != string::npos) {
+                    string output = parseDQ(input.substr(5));
+                    cout << output << endl;
+                }
+                else {
+                    vector<string> qText = extractQuotedText(input);
+                    for (int i = 0; i < qText.size(); i++) {
+                        cout << qText[i] << " ";
+                    }
+                    cout << endl;
+                }
+            }
+            else {
+                if (input.find('\\') != string::npos) {
+                    string res = "";
+                    bool escape = false;
+                    for (auto c : input.substr(5)) {
+                        if (escape) {
+                            res.push_back(c);
+                            escape = false;
+                        }
+                        else if (c == '\\') {
+                            escape = true;
+                        }
+                        else {
+                            res.push_back(c);
+                        }
+                    }
+                    cout << res << endl;
+                }
+                else {
+                    for (int i = 1; i < args.size(); i++) {
+                        if (!args[i].empty()) cout << args[i] << " ";
+                    }
+                    cout << endl;
+                }
+            }
+        }
+        else if (input.find("type ") == 0) {
+            if (input.find("echo") != string::npos or input.find("exit") != string::npos or input.substr(5).find("type") != string::npos or input.substr(5).find("pwd") != string::npos) {
+                cout << input.substr(5) << " is a shell builtin\n";
+            }
+            else {
+                string path = getPath(input.substr(5));
+                if (!path.empty()) {
+                    cout << input.substr(5) << " is " << path << endl;
+                }
+                else {
+                    cout << input.substr(5) << ": not found\n";
+                }
+            }
+        }
+        else if (args[0] == "pwd") {
+            string currPath = filesystem::current_path().string();
+            currPath = currPath.substr(0, currPath.length());
+            cout << currPath << endl;
+        }
+        else if (args[0] == "cd") {
+            if (args[1] == "~") {
+                chdir(getenv("HOME"));
+            }
+            else if (filesystem::exists(args[1])) {
+                filesystem::current_path(args[1]);
+            }
+            else {
+                cout << "cd: " << args[1] << ": No such file or directory\n";
+            }
+        }
+        else if (args[0] == "cat") {
+            system(input.c_str());
+        }
+        else {
+            if (!execprog(input) and !execQprog(input)) {
+                cout << input << ": command not found\n";
+            }
+        }
     }
-    if (error) {
-       doCommandNotFound(command);
-    }
-    if (exit) {
-      break;
-    }
-    std::cout << "$ "; 
-  }
 }
