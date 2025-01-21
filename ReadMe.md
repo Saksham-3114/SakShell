@@ -30,6 +30,11 @@
    - Provides a clean and intuitive user experience for executing commands.  
 
 ---
+![screenshot](https://github.com/Saksham-3114/SakShell/blob/main/Screenshot%202024-12-22%20140035.png) 
+![screenshot](https://github.com/Saksham-3114/SakShell/blob/main/Screenshot%202024-12-22%20135635.png)
+![screenshot](https://github.com/Saksham-3114/SakShell/blob/main/Pasted%20image.png)
+
+---
 
 ## Installation  
 
